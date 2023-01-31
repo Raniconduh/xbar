@@ -121,4 +121,5 @@ int main() {
 
 void sighandler() {
 	XCloseDisplay(dpy);
+	exit(1);
 }
