@@ -41,16 +41,14 @@ void redraw_bar(void) {
 
 
 void write_bar(void) {
-	XClearWindow(dpy, bar.w);
-
 	char * txt;
 	if (!XFetchName(dpy, root, &txt)) return;
 	XFree(bar.txt);
 	int tlen = strlen(txt);
 	bar.txt = txt;
 	bar.tlen = tlen;
-	XDrawString(dpy, bar.w, bar.gc, (screen.w / 2) - (tlen * 5 / 2),
-	            (bar.fh + bar.wh) / 2 - 2, txt, tlen);
+
+	redraw_bar();
 }
 
 
@@ -60,7 +58,7 @@ int main() {
 		exit(1);
 	}
 
-	signal(SIGKILL, sighandler);
+	signal(SIGINT, sighandler);
 	signal(SIGTERM, sighandler);
 
 	screen.s = DefaultScreen(dpy);
@@ -80,8 +78,8 @@ int main() {
 	XSync(dpy, False);
 
 	XSelectInput(dpy, bar.w, StructureNotifyMask
-			     | VisibilityChangeMask
-				 | ResizeRedirectMask
+	                         | VisibilityChangeMask
+	                         | ResizeRedirectMask
 	);
 
 	XFontStruct * finfo = XLoadQueryFont(dpy, "fixed");
@@ -121,11 +119,6 @@ int main() {
 	return 0;
 }
 
-void sighandler(int signo) {
-	switch (signo) {
-		case SIGKILL:
-		case SIGTERM:
-			XCloseDisplay(dpy);
-			break;
-	}
+void sighandler() {
+	XCloseDisplay(dpy);
 }
