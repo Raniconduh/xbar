@@ -58,8 +58,8 @@ int main() {
 		exit(1);
 	}
 
-	signal(SIGINT, sighandler);
-	signal(SIGTERM, sighandler);
+	sigaction(SIGINT, &(struct sigaction){.sa_handler = sighandler}, NULL);
+	sigaction(SIGTERM, &(struct sigaction){.sa_handler = sighandler}, NULL);
 
 	screen.s = DefaultScreen(dpy);
 	root     = RootWindow(dpy, screen.s);
@@ -119,7 +119,8 @@ int main() {
 	return 0;
 }
 
+
 void sighandler() {
-	XCloseDisplay(dpy);
-	exit(1);
+	XKillClient(dpy, AllTemporary);
+	_Exit(1);
 }
